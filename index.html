@@ -1,0 +1,2725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Information Vault</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --danger: #f5576c;
+            --success: #4facfe;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-glass: rgba(255, 255, 255, 0.85);
+            --card-glass-hover: rgba(255, 255, 255, 0.9);
+            --border-glass: rgba(255, 255, 255, 0.3);
+            --text: #2c3e50;
+            --text-light: #718096;
+            --text-white: #ffffff;
+            --shadow-glass: 0 4px 20px 0 rgba(31, 38, 135, 0.25);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(252, 163, 17, 0.3), transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(79, 172, 254, 0.3), transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-container {
+            display: flex;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .login-box {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow-glass);
+            flex: 1;
+        }
+
+        .emergency-contacts-box {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow-glass);
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .emergency-contacts-box h2 {
+            color: var(--text);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .emergency-contact {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            border-left: 3px solid var(--danger);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .emergency-contact:hover {
+            background: rgba(255, 255, 255, 0.75);
+            transform: translateY(-2px);
+        }
+
+        .emergency-contact h3 {
+            color: var(--text);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .emergency-contact p {
+            color: var(--text);
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .emergency-contact a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .emergency-contact a:hover {
+            text-decoration: underline;
+        }
+
+        .login-box h1 {
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .login-box p {
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text);
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 20px 20px 0 0;
+            border: 1px solid var(--border-glass);
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: var(--text);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Filters */
+        .filters-section {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid var(--border-glass);
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 180px;
+            flex: 0 0 auto;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .filter-group select,
+        .filter-group input[type="date"] {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 6px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: block;
+        }
+
+        /* Entry List */
+        .entries {
+            display: grid;
+            gap: 8px;
+        }
+
+        .entry-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 12px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-glass);
+        }
+
+        .entry-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(31, 38, 135, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .entry-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .entry-timestamp {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            font-weight: 400;
+        }
+
+        .entry-timestamp-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            line-height: 1.3;
+        }
+
+        .timestamp-icon {
+            font-size: 11px;
+        }
+
+        .timestamp-label {
+            font-weight: 500;
+        }
+
+        .timestamp-value {
+            color: var(--text);
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .entry-fields {
+            display: grid;
+            gap: 5px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .field-label {
+            color: var(--text-light);
+            font-weight: 500;
+            padding-top: 5px;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .field-value {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 5px 10px;
+            border-radius: 8px;
+            word-break: break-word;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .field-value.sensitive {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 235, 205, 0.8);
+            border-left: 3px solid #ffc107;
+        }
+
+        /* Attachments */
+        .attachments-section {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .attachments-label {
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .attachment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .attachment-item:hover {
+            background: rgba(255, 255, 255, 0.75);
+            transform: translateX(5px);
+        }
+
+        .attachment-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .attachment-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .attachment-details {
+            flex: 1;
+        }
+
+        .attachment-name {
+            font-weight: 500;
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        .attachment-size {
+            font-size: 11px;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+
+        .attachment-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            color: var(--text);
+        }
+
+        .file-upload-area p {
+            color: var(--text);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(1.02);
+        }
+
+        #mainApp {
+            min-height: 100vh;
+        }
+
+        #mainApp .container {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow-glass);
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.2);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 6px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f5576c, #f093fb);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 6px 25px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .no-emergency-contacts {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .entry-category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        /* Reminder Banner */
+        .reminder-banner {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff6b35 100%);
+            color: #2c3e50;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reminder-banner strong {
+            font-weight: 600;
+        }
+
+        /* Access Card Print Styles */
+        .access-card {
+            background: white;
+            border: 2px solid #2c3e50;
+            border-radius: 15px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .access-card h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+
+        .access-card-section {
+            margin-bottom: 15px;
+        }
+
+        .access-card-section strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .access-card-section p {
+            margin: 3px 0;
+            padding-left: 10px;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .password-sealed {
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0,
+                #f0f0f0 10px,
+                #e0e0e0 10px,
+                #e0e0e0 20px
+            );
+            padding: 15px;
+            border: 2px dashed #999;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        @media print {
+            body::before {
+                display: none;
+            }
+
+            .header-actions, .btn, .filters-section, .entry-actions, .modal-header button {
+                display: none !important;
+            }
+
+            .entry-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-bottom: 15px;
+            }
+
+            .entry-category-badge {
+                background: #667eea !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #mainApp .container {
+                padding: 10px;
+            }
+
+            .access-card {
+                page-break-inside: avoid;
+                border: 3px solid #2c3e50 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .password-sealed {
+                background: repeating-linear-gradient(
+                    45deg,
+                    #f0f0f0,
+                    #f0f0f0 10px,
+                    #e0e0e0 10px,
+                    #e0e0e0 20px
+                ) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Utility */
+        .text-right {
+            text-align: right;
+        }
+
+        .mt-20 {
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .emergency-contacts-box {
+                max-width: 100%;
+            }
+
+            .filter-group {
+                min-width: 150px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .field-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            .attachment-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .attachment-actions {
+                width: 100%;
+            }
+
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+
+            .filter-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-box">
+                <h1>Legacy Information Vault</h1>
+                <p>Enter the password from the sealed envelope</p>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="login()">Access Vault</button>
+                <p style="margin-top: 20px; font-size: 12px;" id="setupMessage"></p>
+            </div>
+
+            <div class="emergency-contacts-box">
+                <h2>🚨 Emergency Contacts</h2>
+                <div id="emergencyContactsDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <div class="container">
+            <div class="header">
+                <h1>Legacy Information Vault</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary btn-small" onclick="manageEmergencyContacts()">Emergency Contacts</button>
+                    <button class="btn btn-success btn-small" onclick="generateAccessCard()">🆘 Access Card</button>
+                    <button class="btn btn-primary btn-small" onclick="showGitHubGuide()">📘 GitHub Setup</button>
+                    <button class="btn btn-secondary btn-small" onclick="exportData()">Export Backup</button>
+                    <button class="btn btn-secondary btn-small" onclick="importData()">Import Backup</button>
+                    <button class="btn btn-danger btn-small" onclick="logout()">Lock</button>
+                </div>
+            </div>
+
+            <!-- Update Reminder Banner -->
+            <div id="updateReminderBanner" class="reminder-banner hidden">
+                <div style="flex: 1;">
+                    <strong>⏰ Update Reminder:</strong> It's been <span id="daysSinceUpdate"></span> days since your last update. Consider reviewing your information.
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-success btn-small" onclick="markAsUpdated()">Mark as Updated</button>
+                    <button class="btn btn-secondary btn-small" onclick="dismissReminder()">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label>Filter by Category</label>
+                    <select id="filterCategory" onchange="applyFilters()">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>From Date</label>
+                    <input type="date" id="filterDateFrom" onchange="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>To Date</label>
+                    <input type="date" id="filterDateTo" onchange="applyFilters()">
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-secondary btn-small" onclick="setDateRange('week')">This Week</button>
+                    <button class="btn btn-secondary btn-small" onclick="setDateRange('month')">This Month</button>
+                    <button class="btn btn-secondary btn-small" onclick="setDateRange('last7')">Last 7 Days</button>
+                    <button class="btn btn-secondary btn-small" onclick="clearFilters()">Clear</button>
+                    <button class="btn btn-primary btn-small" onclick="window.print()">Print</button>
+                </div>
+            </div>
+
+            <!-- Email Summary Section -->
+            <div class="filters-section">
+                <div style="flex: 1;">
+                    <label style="font-weight: 600; color: var(--text); margin-bottom: 5px; display: block;">📧 Email Change Summary</label>
+                    <p style="font-size: 12px; color: var(--text-light); margin: 0;">Send a summary of entries created or updated in the selected date range</p>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-success btn-small" onclick="emailSummary()">Email Summary</button>
+                    <button class="btn btn-secondary btn-small" onclick="copySummary()">Copy to Clipboard</button>
+                    <button class="btn btn-secondary btn-small" onclick="previewSummary()">Preview</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div id="tabContents"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Entry -->
+    <div id="entryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Entry</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="entryForm" onsubmit="saveEntry(event)">
+                <input type="hidden" id="entryId">
+                
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="entryCategory" required onchange="updateFormFields()">
+                        <option value="">Select a category...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Title <span id="titleOptionalIndicator" style="font-weight: normal; color: var(--text-light);">*</span></label>
+                    <input type="text" id="entryTitle" required>
+                </div>
+
+                <div id="fieldsContainer"></div>
+
+                <!-- File Attachments -->
+                <div class="form-group" id="attachmentsFormGroup">
+                    <label>Attachments</label>
+                    <div class="file-upload-area" id="fileDropArea">
+                        <p>📎 Drag & drop files here or click to browse</p>
+                        <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">
+                            Supported: PDF, Images, Documents (Max 5MB per file)
+                        </p>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" style="display: none;">
+                    <div id="uploadedFilesList" class="attachment-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="entryNotes" placeholder="Additional information..."></textarea>
+                </div>
+
+                <div class="text-right">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Emergency Contacts Management -->
+    <div id="emergencyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Emergency Contacts</h2>
+                <button class="close-modal" onclick="closeEmergencyModal()">&times;</button>
+            </div>
+            <p style="margin-bottom: 20px; color: var(--text-light);">
+                These contacts will be visible on the login screen without requiring a password.
+            </p>
+            
+            <div id="emergencyContactsList" style="margin-bottom: 20px;"></div>
+
+            <button class="btn btn-success" onclick="addEmergencyContact()">+ Add Emergency Contact</button>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Emergency Contact -->
+    <div id="emergencyContactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="emergencyContactModalTitle">Add Emergency Contact</h2>
+                <button class="close-modal" onclick="closeEmergencyContactForm()">&times;</button>
+            </div>
+            <form id="emergencyContactForm" onsubmit="saveEmergencyContact(event)">
+                <input type="hidden" id="emergencyContactId">
+                
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="emergencyContactName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Relationship</label>
+                    <input type="text" id="emergencyContactRelationship" placeholder="e.g., Executor, Next of Kin">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="tel" id="emergencyContactPhone" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="emergencyContactEmail">
+                </div>
+
+                <div class="text-right">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmergencyContactForm()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(event)">
+
+    <!-- Modal for Email Summary Preview -->
+    <div id="summaryPreviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Email Summary Preview</h2>
+                <button class="close-modal" onclick="closeSummaryPreview()">&times;</button>
+            </div>
+            <div id="summaryPreviewContent" style="background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 10px; font-family: monospace; white-space: pre-wrap; max-height: 500px; overflow-y: auto; font-size: 13px; line-height: 1.6;"></div>
+            <div class="text-right" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeSummaryPreview()">Close</button>
+                <button class="btn btn-success" onclick="emailSummary()">Send Email</button>
+                <button class="btn btn-primary" onclick="copySummary()">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for GitHub Pages Guide -->
+    <div id="githubGuideModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>📘 GitHub Pages Setup Guide</h2>
+                <button class="close-modal" onclick="closeGitHubGuide()">&times;</button>
+            </div>
+            <div style="padding: 20px; max-height: 600px; overflow-y: auto;">
+                <p style="background: #fffbea; padding: 15px; border-radius: 10px; border-left: 4px solid #ffd93d; margin-bottom: 20px;">
+                    <strong>📌 Why GitHub Pages?</strong><br>
+                    • 100% FREE forever<br>
+                    • No account needed for survivors to view<br>
+                    • Your vault gets a permanent URL like: <code>https://yourname.github.io/legacy-vault</code><br>
+                    • Update anytime by uploading new file
+                </p>
+
+                <h3 style="color: var(--primary); margin-top: 20px;">Step 1: Create GitHub Account</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Go to <a href="https://github.com" target="_blank">github.com</a></li>
+                    <li>Click "Sign up" (top right)</li>
+                    <li>Choose a username (this will be in your URL)</li>
+                    <li>Verify email and complete setup</li>
+                </ol>
+
+                <h3 style="color: var(--primary); margin-top: 20px;">Step 2: Create Repository</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Click the "+" icon (top right) → "New repository"</li>
+                    <li><strong>Repository name:</strong> <code>legacy-vault</code></li>
+                    <li>Description: "Personal legacy information vault"</li>
+                    <li>Choose: <strong>Public</strong> (so anyone with link can access)</li>
+                    <li>Check: "Add a README file"</li>
+                    <li>Click "Create repository"</li>
+                </ol>
+
+                <h3 style="color: var(--primary); margin-top: 20px;">Step 3: Upload Your Vault File</h3>
+                <ol style="line-height: 1.8;">
+                    <li>In your repository, click "Add file" → "Upload files"</li>
+                    <li>Drag and drop your <code>legacy-vault.html</code> file</li>
+                    <li><strong>Important:</strong> Rename it to <code>index.html</code></li>
+                    <li>Scroll down, click "Commit changes"</li>
+                </ol>
+
+                <h3 style="color: var(--primary); margin-top: 20px;">Step 4: Enable GitHub Pages</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Click "Settings" tab (top menu)</li>
+                    <li>Scroll down left sidebar, click "Pages"</li>
+                    <li>Under "Source", select: <strong>Deploy from a branch</strong></li>
+                    <li>Branch: <strong>main</strong>, Folder: <strong>/ (root)</strong></li>
+                    <li>Click "Save"</li>
+                    <li>Wait 1-2 minutes, refresh page</li>
+                    <li>You'll see: "Your site is live at https://username.github.io/legacy-vault/"</li>
+                </ol>
+
+                <h3 style="color: var(--primary); margin-top: 20px;">Step 5: Test & Share</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Open your URL in a private/incognito browser window</li>
+                    <li>Verify the password login works</li>
+                    <li>Copy the URL for your Emergency Access Card</li>
+                    <li><strong>To update:</strong> Upload new index.html file (replaces old one)</li>
+                </ol>
+
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                    <strong>✅ Your vault is now accessible worldwide at:</strong><br>
+                    <code style="background: white; padding: 5px 10px; border-radius: 5px; display: inline-block; margin-top: 5px;">
+                        https://[your-username].github.io/legacy-vault/
+                    </code>
+                </div>
+
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <strong>⚠️ Security Note:</strong><br>
+                    The file is public, but password-protected. Store the password separately in your Emergency Access Card.
+                </div>
+            </div>
+            <div class="text-right" style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="closeGitHubGuide()">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Access Card Generator -->
+    <div id="accessCardModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>🆘 Emergency Access Card Generator</h2>
+                <button class="close-modal" onclick="closeAccessCard()">&times;</button>
+            </div>
+            <form id="accessCardForm" onsubmit="generateAccessCardPreview(event)">
+                <div class="form-group">
+                    <label>GitHub Pages URL (if set up)</label>
+                    <input type="text" id="githubURL" placeholder="https://yourname.github.io/legacy-vault">
+                </div>
+
+                <div class="form-group">
+                    <label>Dropbox/Cloud Link (optional)</label>
+                    <input type="text" id="cloudURL" placeholder="https://dropbox.com/...">
+                </div>
+
+                <div class="form-group">
+                    <label>Primary USB Location</label>
+                    <input type="text" id="usbLocation" placeholder="e.g., Home safe, top drawer" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Backup USB Location</label>
+                    <input type="text" id="backupUSBLocation" placeholder="e.g., With executor: John Smith">
+                </div>
+
+                <div class="form-group">
+                    <label>Other Locations</label>
+                    <textarea id="otherLocations" placeholder="e.g., Copy in will with solicitor&#10;Safety deposit box at ABC Bank"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Password Hint (optional - for card only)</label>
+                    <input type="text" id="passwordHint" placeholder="e.g., Mother's maiden name + birth year">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="includePassword" onchange="togglePasswordField()">
+                        <span>Include actual password on card (will be sealed section for envelope)</span>
+                    </label>
+                    <input type="text" id="actualPassword" placeholder="Enter vault password" style="display: none; margin-top: 10px;">
+                </div>
+
+                <div class="text-right">
+                    <button type="button" class="btn btn-secondary" onclick="closeAccessCard()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Generate Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Access Card Preview/Print -->
+    <div id="accessCardPreviewModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Emergency Access Card - Ready to Print</h2>
+                <button class="close-modal" onclick="closeAccessCardPreview()">&times;</button>
+            </div>
+            <div id="accessCardPreview" style="padding: 20px;"></div>
+            <div class="text-right" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeAccessCardPreview()">Close</button>
+                <button class="btn btn-primary" onclick="printAccessCard()">🖨️ Print Card</button>
+                <button class="btn btn-success" onclick="saveAccessCardPDF()">💾 Save as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CATEGORIES = {
+            overview: {
+                name: "Getting Started",
+                allowAttachments: false,
+                fields: [
+                    { label: "Document Location", type: "text" },
+                    { label: "Primary Contact", type: "text" },
+                    { label: "Contact Phone", type: "tel" },
+                    { label: "Instructions", type: "text" }
+                ]
+            },
+            contacts: {
+                name: "Who to Notify",
+                allowAttachments: false,
+                fields: [
+                    { label: "Name", type: "text" },
+                    { label: "Relationship", type: "text" },
+                    { label: "Email", type: "email" },
+                    { label: "Phone", type: "tel" },
+                    { label: "Address", type: "text" }
+                ]
+            },
+            medical: {
+                name: "Medical & Healthcare",
+                allowAttachments: true,
+                fields: [
+                    { label: "Category", type: "text" },
+                    { label: "Provider/Medication Name", type: "text" },
+                    { label: "Doctor/Pharmacy", type: "text" },
+                    { label: "Contact Phone", type: "tel" },
+                    { label: "Dosage/Frequency", type: "text" },
+                    { label: "Medical Record Number", type: "sensitive" }
+                ]
+            },
+            government: {
+                name: "Government & Official",
+                allowAttachments: true,
+                fields: [
+                    { label: "Document Type", type: "text" },
+                    { label: "Document Number", type: "sensitive" },
+                    { label: "Issuing Authority", type: "text" },
+                    { label: "Issue Date", type: "text" },
+                    { label: "Expiry Date", type: "text" },
+                    { label: "Physical Location", type: "text" }
+                ]
+            },
+            financial: {
+                name: "Banking & Finance",
+                allowAttachments: true,
+                fields: [
+                    { label: "Institution", type: "text" },
+                    { label: "Account Type", type: "text" },
+                    { label: "Account Number", type: "sensitive" },
+                    { label: "BSB/Routing", type: "text" },
+                    { label: "Online Access URL", type: "text" },
+                    { label: "Contact Phone", type: "tel" }
+                ]
+            },
+            insurance: {
+                name: "Insurance Policies",
+                allowAttachments: true,
+                fields: [
+                    { label: "Provider", type: "text" },
+                    { label: "Policy Type", type: "text" },
+                    { label: "Policy Number", type: "sensitive" },
+                    { label: "Contact Phone", type: "tel" },
+                    { label: "Coverage Amount", type: "text" }
+                ]
+            },
+            legal: {
+                name: "Legal Documents",
+                allowAttachments: true,
+                fields: [
+                    { label: "Document Type", type: "text" },
+                    { label: "Location", type: "text" },
+                    { label: "Lawyer/Contact", type: "text" },
+                    { label: "Phone", type: "tel" },
+                    { label: "Reference Number", type: "text" }
+                ]
+            },
+            advisors: {
+                name: "Tax & Legal Advisors",
+                allowAttachments: true,
+                fields: [
+                    { label: "Advisor Type", type: "text" },
+                    { label: "Name", type: "text" },
+                    { label: "Firm/Company", type: "text" },
+                    { label: "Phone", type: "tel" },
+                    { label: "Email", type: "email" },
+                    { label: "Last Contact", type: "text" }
+                ]
+            },
+            digital: {
+                name: "Digital Accounts",
+                allowAttachments: false,
+                fields: [
+                    { label: "Service/Platform", type: "text" },
+                    { label: "Username/Email", type: "email" },
+                    { label: "Password", type: "sensitive" },
+                    { label: "URL", type: "text" },
+                    { label: "2FA/Recovery Info", type: "sensitive" }
+                ]
+            },
+            property: {
+                name: "Property & Assets",
+                allowAttachments: true,
+                fields: [
+                    { label: "Property Type", type: "text" },
+                    { label: "Address/Location", type: "text" },
+                    { label: "Title/Deed Location", type: "text" },
+                    { label: "Value/Details", type: "text" }
+                ]
+            },
+            locations: {
+                name: "Physical Locations",
+                allowAttachments: false,
+                fields: [
+                    { label: "Location Type", type: "text" },
+                    { label: "Address/Location", type: "text" },
+                    { label: "Access Method", type: "text" },
+                    { label: "Code/Key Location", type: "sensitive" },
+                    { label: "Contents", type: "text" },
+                    { label: "Contact Info", type: "tel" }
+                ]
+            },
+            security: {
+                name: "Security Codes",
+                allowAttachments: false,
+                fields: [
+                    { label: "Location/Device", type: "text" },
+                    { label: "Code/PIN", type: "sensitive" },
+                    { label: "Reset Instructions", type: "text" }
+                ]
+            },
+            memberships: {
+                name: "Memberships",
+                allowAttachments: false,
+                fields: [
+                    { label: "Organization", type: "text" },
+                    { label: "Membership Number", type: "text" },
+                    { label: "Contact", type: "tel" },
+                    { label: "Renewal Date", type: "text" },
+                    { label: "Cancel Instructions", type: "text" }
+                ]
+            },
+            pets: {
+                name: "Pets & Dependents",
+                allowAttachments: true,
+                fields: [
+                    { label: "Name", type: "text" },
+                    { label: "Type/Age/Breed", type: "text" },
+                    { label: "Medical Conditions", type: "text" },
+                    { label: "Vet/Doctor", type: "text" },
+                    { label: "Contact Phone", type: "tel" },
+                    { label: "Care Instructions", type: "text" },
+                    { label: "Preferred Caretaker", type: "text" }
+                ]
+            },
+            funeral: {
+                name: "Funeral & Memorial",
+                allowAttachments: true,
+                fields: [
+                    { label: "Preference Category", type: "text" },
+                    { label: "Specific Wishes", type: "text" },
+                    { label: "Funeral Home/Contact", type: "text" },
+                    { label: "Contact Phone", type: "tel" },
+                    { label: "Prepaid Details", type: "text" },
+                    { label: "Cemetery/Location", type: "text" }
+                ]
+            },
+            sentimental: {
+                name: "Sentimental Items",
+                allowAttachments: true,
+                fields: [
+                    { label: "Item Description", type: "text" },
+                    { label: "Current Location", type: "text" },
+                    { label: "Intended Recipient", type: "text" },
+                    { label: "Story/Significance", type: "text" },
+                    { label: "Estimated Value", type: "text" }
+                ]
+            },
+            education: {
+                name: "Education Records",
+                allowAttachments: true,
+                fields: [
+                    { label: "Institution", type: "text" },
+                    { label: "Degree/Certificate", type: "text" },
+                    { label: "Field of Study", type: "text" },
+                    { label: "Year Completed", type: "text" },
+                    { label: "Document Location", type: "text" }
+                ]
+            },
+            messages: {
+                name: "Personal Messages",
+                allowAttachments: true,
+                fields: [
+                    { label: "Recipient", type: "text" },
+                    { label: "Message Type", type: "text" },
+                    { label: "Location/Format", type: "text" },
+                    { label: "When to Deliver", type: "text" }
+                ]
+            }
+        };
+
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+        // State
+        let vaultData = {};
+        let emergencyContacts = [];
+        let editingEntry = null;
+        let editingEntryCategory = null;
+        let editingEmergencyContact = null;
+        let currentAttachments = [];
+        let currentFilters = {
+            category: 'all',
+            dateFrom: null,
+            dateTo: null
+        };
+
+        // Initialize
+        function init() {
+            loadData();
+            loadEmergencyContacts();
+            displayEmergencyContacts();
+            checkPassword();
+            setupFileUpload();
+        }
+
+        function checkPassword() {
+            const storedHash = localStorage.getItem('vaultPasswordHash');
+            if (!storedHash) {
+                document.getElementById('setupMessage').textContent = 
+                    'First time setup: Enter a password to protect this vault';
+            }
+        }
+
+        function hashPassword(password) {
+            // Simple hash for demo - in production, use Web Crypto API
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
+        }
+
+        function login() {
+            const password = document.getElementById('loginPassword').value;
+            if (!password) return;
+
+            const storedHash = localStorage.getItem('vaultPasswordHash');
+            const inputHash = hashPassword(password);
+
+            if (!storedHash) {
+                // First time setup
+                localStorage.setItem('vaultPasswordHash', inputHash);
+                showApp();
+            } else if (inputHash === storedHash) {
+                showApp();
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            initializeFilters();
+            renderContent();
+            checkUpdateReminder();
+        }
+
+        function initializeFilters() {
+            const filterCategory = document.getElementById('filterCategory');
+            filterCategory.innerHTML = '<option value="all">All Categories</option>';
+            
+            Object.keys(CATEGORIES).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = CATEGORIES[key].name;
+                filterCategory.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            currentFilters.category = document.getElementById('filterCategory').value;
+            currentFilters.dateFrom = document.getElementById('filterDateFrom').value;
+            currentFilters.dateTo = document.getElementById('filterDateTo').value;
+            renderContent();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterCategory').value = 'all';
+            document.getElementById('filterDateFrom').value = '';
+            document.getElementById('filterDateTo').value = '';
+            currentFilters = {
+                category: 'all',
+                dateFrom: null,
+                dateTo: null
+            };
+            renderContent();
+        }
+
+        function setDateRange(preset) {
+            const today = new Date();
+            let fromDate, toDate;
+
+            switch(preset) {
+                case 'week':
+                    // Current week (Monday to Sunday)
+                    const dayOfWeek = today.getDay();
+                    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                    fromDate = new Date(today);
+                    fromDate.setDate(today.getDate() + mondayOffset);
+                    toDate = new Date(fromDate);
+                    toDate.setDate(fromDate.getDate() + 6);
+                    break;
+                
+                case 'month':
+                    // Current month
+                    fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    break;
+                
+                case 'last7':
+                    // Last 7 days
+                    fromDate = new Date(today);
+                    fromDate.setDate(today.getDate() - 7);
+                    toDate = today;
+                    break;
+            }
+
+            // Format dates as YYYY-MM-DD for input fields
+            document.getElementById('filterDateFrom').value = formatDateForInput(fromDate);
+            document.getElementById('filterDateTo').value = formatDateForInput(toDate);
+            applyFilters();
+        }
+
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function generateSummary() {
+            const fromDate = currentFilters.dateFrom ? new Date(currentFilters.dateFrom) : null;
+            const toDate = currentFilters.dateTo ? new Date(currentFilters.dateTo) : null;
+            
+            let dateRangeText = 'All Time';
+            if (fromDate && toDate) {
+                dateRangeText = `${fromDate.toLocaleDateString()} - ${toDate.toLocaleDateString()}`;
+            } else if (fromDate) {
+                dateRangeText = `From ${fromDate.toLocaleDateString()}`;
+            } else if (toDate) {
+                dateRangeText = `Up to ${toDate.toLocaleDateString()}`;
+            }
+
+            // Collect all entries
+            let allEntries = [];
+            Object.keys(CATEGORIES).forEach(category => {
+                const entries = vaultData[category] || [];
+                entries.forEach(entry => {
+                    allEntries.push({
+                        ...entry,
+                        category: category,
+                        categoryName: CATEGORIES[category].name
+                    });
+                });
+            });
+
+            // Filter by date range
+            const newEntries = [];
+            const updatedEntries = [];
+
+            allEntries.forEach(entry => {
+                const createdDate = new Date(entry.createdAt);
+                const updatedDate = entry.updatedAt ? new Date(entry.updatedAt) : null;
+
+                let isInRange = true;
+                
+                if (fromDate) {
+                    fromDate.setHours(0, 0, 0, 0);
+                    if (createdDate < fromDate && (!updatedDate || updatedDate < fromDate)) {
+                        isInRange = false;
+                    }
+                }
+                
+                if (toDate && isInRange) {
+                    toDate.setHours(23, 59, 59, 999);
+                    if (createdDate > toDate && (!updatedDate || updatedDate > toDate)) {
+                        isInRange = false;
+                    }
+                }
+
+                if (!isInRange) return;
+
+                // Check if created in range
+                const createdInRange = (!fromDate || createdDate >= fromDate) && (!toDate || createdDate <= toDate);
+                // Check if updated in range
+                const updatedInRange = updatedDate && (!fromDate || updatedDate >= fromDate) && (!toDate || updatedDate <= toDate);
+
+                if (createdInRange && !entry.updatedAt) {
+                    newEntries.push(entry);
+                } else if (updatedInRange) {
+                    updatedEntries.push(entry);
+                } else if (createdInRange && entry.updatedAt) {
+                    // Created in range but also updated (show in both if updated is also in range)
+                    if (updatedInRange) {
+                        updatedEntries.push(entry);
+                    } else {
+                        newEntries.push(entry);
+                    }
+                }
+            });
+
+            // Generate summary text
+            let summary = `LEGACY VAULT - CHANGE SUMMARY\n`;
+            summary += `Date Range: ${dateRangeText}\n`;
+            summary += `Generated: ${new Date().toLocaleString()}\n`;
+            summary += `\n${'='.repeat(60)}\n\n`;
+
+            if (newEntries.length === 0 && updatedEntries.length === 0) {
+                summary += `No changes found in this date range.\n`;
+                return summary;
+            }
+
+            // New Entries
+            if (newEntries.length > 0) {
+                summary += `NEW ENTRIES (${newEntries.length}):\n`;
+                summary += `${'-'.repeat(60)}\n\n`;
+
+                newEntries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                newEntries.forEach((entry, index) => {
+                    summary += `${index + 1}. [${entry.categoryName}] ${entry.title}\n`;
+                    summary += `   Created: ${new Date(entry.createdAt).toLocaleString()}\n`;
+                    
+                    // Add key fields
+                    entry.fields.forEach(field => {
+                        if (field.value && field.type !== 'sensitive') {
+                            summary += `   ${field.label}: ${field.value}\n`;
+                        } else if (field.value && field.type === 'sensitive') {
+                            summary += `   ${field.label}: [PROTECTED]\n`;
+                        }
+                    });
+
+                    if (entry.notes) {
+                        summary += `   Notes: ${entry.notes}\n`;
+                    }
+
+                    if (entry.attachments && entry.attachments.length > 0) {
+                        summary += `   Attachments: ${entry.attachments.length} file(s)\n`;
+                    }
+
+                    summary += `\n`;
+                });
+
+                summary += `\n`;
+            }
+
+            // Updated Entries
+            if (updatedEntries.length > 0) {
+                summary += `UPDATED ENTRIES (${updatedEntries.length}):\n`;
+                summary += `${'-'.repeat(60)}\n\n`;
+
+                updatedEntries.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+                updatedEntries.forEach((entry, index) => {
+                    summary += `${index + 1}. [${entry.categoryName}] ${entry.title}\n`;
+                    summary += `   Created: ${new Date(entry.createdAt).toLocaleString()}\n`;
+                    summary += `   Updated: ${new Date(entry.updatedAt).toLocaleString()}\n`;
+                    
+                    // Add key fields
+                    entry.fields.forEach(field => {
+                        if (field.value && field.type !== 'sensitive') {
+                            summary += `   ${field.label}: ${field.value}\n`;
+                        } else if (field.value && field.type === 'sensitive') {
+                            summary += `   ${field.label}: [PROTECTED]\n`;
+                        }
+                    });
+
+                    if (entry.notes) {
+                        summary += `   Notes: ${entry.notes}\n`;
+                    }
+
+                    if (entry.attachments && entry.attachments.length > 0) {
+                        summary += `   Attachments: ${entry.attachments.length} file(s)\n`;
+                    }
+
+                    summary += `\n`;
+                });
+            }
+
+            summary += `${'='.repeat(60)}\n`;
+            summary += `Total New: ${newEntries.length} | Total Updated: ${updatedEntries.length}\n`;
+
+            return summary;
+        }
+
+        function emailSummary() {
+            const summary = generateSummary();
+            const subject = `Legacy Vault Changes - ${new Date().toLocaleDateString()}`;
+            
+            // Create mailto link
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+        }
+
+        function copySummary() {
+            const summary = generateSummary();
+            
+            navigator.clipboard.writeText(summary).then(() => {
+                alert('Summary copied to clipboard! You can now paste it into your email.');
+            }).catch(err => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = summary;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('Summary copied to clipboard! You can now paste it into your email.');
+                } catch (err) {
+                    alert('Could not copy to clipboard. Please use the preview to manually copy.');
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        function previewSummary() {
+            const summary = generateSummary();
+            document.getElementById('summaryPreviewContent').textContent = summary;
+            document.getElementById('summaryPreviewModal').classList.add('active');
+        }
+
+        function closeSummaryPreview() {
+            document.getElementById('summaryPreviewModal').classList.remove('active');
+        }
+
+        // GitHub Pages Guide
+        function showGitHubGuide() {
+            document.getElementById('githubGuideModal').classList.add('active');
+        }
+
+        function closeGitHubGuide() {
+            document.getElementById('githubGuideModal').classList.remove('active');
+        }
+
+        // Emergency Access Card Generator
+        function generateAccessCard() {
+            // Pre-fill with emergency contacts
+            document.getElementById('accessCardModal').classList.add('active');
+        }
+
+        function closeAccessCard() {
+            document.getElementById('accessCardModal').classList.remove('active');
+        }
+
+        function togglePasswordField() {
+            const checkbox = document.getElementById('includePassword');
+            const passwordField = document.getElementById('actualPassword');
+            passwordField.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) {
+                passwordField.value = '';
+            }
+        }
+
+        function generateAccessCardPreview(event) {
+            event.preventDefault();
+
+            const githubURL = document.getElementById('githubURL').value;
+            const cloudURL = document.getElementById('cloudURL').value;
+            const usbLocation = document.getElementById('usbLocation').value;
+            const backupUSBLocation = document.getElementById('backupUSBLocation').value;
+            const otherLocations = document.getElementById('otherLocations').value;
+            const passwordHint = document.getElementById('passwordHint').value;
+            const includePassword = document.getElementById('includePassword').checked;
+            const actualPassword = document.getElementById('actualPassword').value;
+
+            let cardHTML = `
+                <div class="access-card">
+                    <h2>🚨 LEGACY INFORMATION VAULT<br>EMERGENCY ACCESS</h2>
+                    
+                    <div class="access-card-section">
+                        <strong>📍 VAULT LOCATIONS:</strong>
+                        ${githubURL ? `<p>🌐 Online: ${githubURL}</p>` : ''}
+                        ${cloudURL ? `<p>☁️ Cloud: ${cloudURL}</p>` : ''}
+                        <p>💾 Primary USB: ${usbLocation}</p>
+                        ${backupUSBLocation ? `<p>💾 Backup USB: ${backupUSBLocation}</p>` : ''}
+                        ${otherLocations ? otherLocations.split('\n').map(loc => `<p>📂 ${loc}</p>`).join('') : ''}
+                    </div>
+
+                    ${includePassword && actualPassword ? `
+                    <div class="access-card-section">
+                        <strong>🔐 PASSWORD (SEALED):</strong>
+                        <div class="password-sealed">
+                            ${actualPassword}
+                        </div>
+                        <p style="font-size: 11px; color: #999; text-align: center;">
+                            ✂️ Cut and seal this section before distributing ✂️
+                        </p>
+                    </div>
+                    ` : ''}
+
+                    ${!includePassword && passwordHint ? `
+                    <div class="access-card-section">
+                        <strong>🔐 PASSWORD HINT:</strong>
+                        <p>${passwordHint}</p>
+                        <p style="font-size: 11px; color: #999;">
+                            (Full password stored separately in sealed envelope)
+                        </p>
+                    </div>
+                    ` : ''}
+
+                    <div class="access-card-section">
+                        <strong>👥 EMERGENCY CONTACTS:</strong>
+                        ${emergencyContacts.length > 0 ? 
+                            emergencyContacts.map(contact => `
+                                <p><strong>${contact.name}</strong> (${contact.relationship})</p>
+                                <p>📞 ${contact.phone} | 📧 ${contact.email}</p>
+                            `).join('') 
+                            : '<p>No emergency contacts set</p>'}
+                    </div>
+
+                    <div class="access-card-section">
+                        <strong>📅 LAST UPDATED:</strong>
+                        <p>${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #2c3e50; font-size: 11px; color: #666; text-align: center;">
+                        <p><strong>WHERE TO KEEP THIS CARD:</strong></p>
+                        <p>Wallet • With Will • Safe Deposit Box • With Executor • Refrigerator (emergency responders check there)</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('accessCardPreview').innerHTML = cardHTML;
+            document.getElementById('accessCardModal').classList.remove('active');
+            document.getElementById('accessCardPreviewModal').classList.add('active');
+        }
+
+        function closeAccessCardPreview() {
+            document.getElementById('accessCardPreviewModal').classList.remove('active');
+        }
+
+        function printAccessCard() {
+            // Hide everything except the card for printing
+            const originalContent = document.body.innerHTML;
+            const cardContent = document.getElementById('accessCardPreview').innerHTML;
+            
+            document.body.innerHTML = cardContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            
+            // Reinitialize the app after print
+            location.reload();
+        }
+
+        function saveAccessCardPDF() {
+            alert('To save as PDF:\n\n1. Click "Print Card"\n2. Choose "Save as PDF" or "Microsoft Print to PDF" as the printer\n3. Click "Save"\n\nThis creates a PDF you can email or store digitally.');
+        }
+
+        // Update Reminder System
+        function checkUpdateReminder() {
+            const lastUpdate = localStorage.getItem('lastVaultUpdate');
+            const reminderDismissed = localStorage.getItem('reminderDismissed');
+            
+            if (!lastUpdate) {
+                // First time using the app, set current date
+                localStorage.setItem('lastVaultUpdate', new Date().toISOString());
+                return;
+            }
+
+            if (reminderDismissed === 'true') {
+                return; // User dismissed the reminder
+            }
+
+            const lastUpdateDate = new Date(lastUpdate);
+            const now = new Date();
+            const daysDiff = Math.floor((now - lastUpdateDate) / (1000 * 60 * 60 * 24));
+
+            if (daysDiff >= 30) {
+                // Show reminder
+                document.getElementById('daysSinceUpdate').textContent = daysDiff;
+                document.getElementById('updateReminderBanner').classList.remove('hidden');
+            }
+        }
+
+        function markAsUpdated() {
+            localStorage.setItem('lastVaultUpdate', new Date().toISOString());
+            localStorage.setItem('reminderDismissed', 'false');
+            document.getElementById('updateReminderBanner').classList.add('hidden');
+        }
+
+        function dismissReminder() {
+            localStorage.setItem('reminderDismissed', 'true');
+            document.getElementById('updateReminderBanner').classList.add('hidden');
+        }
+
+        function trackUpdate() {
+            // Called whenever data is saved
+            localStorage.setItem('lastVaultUpdate', new Date().toISOString());
+            localStorage.setItem('reminderDismissed', 'false');
+        }
+
+        // Emergency Contacts
+        function loadEmergencyContacts() {
+            const stored = localStorage.getItem('emergencyContacts');
+            emergencyContacts = stored ? JSON.parse(stored) : [];
+        }
+
+        function saveEmergencyContacts() {
+            localStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+            displayEmergencyContacts();
+        }
+
+        function displayEmergencyContacts() {
+            const container = document.getElementById('emergencyContactsDisplay');
+            
+            if (emergencyContacts.length === 0) {
+                container.innerHTML = '<div class="no-emergency-contacts">No emergency contacts configured</div>';
+                return;
+            }
+
+            container.innerHTML = emergencyContacts.map(contact => `
+                <div class="emergency-contact">
+                    <h3>${escapeHtml(contact.name)}</h3>
+                    ${contact.relationship ? `<p><strong>${escapeHtml(contact.relationship)}</strong></p>` : ''}
+                    <p>📞 <a href="tel:${escapeHtml(contact.phone)}">${escapeHtml(contact.phone)}</a></p>
+                    ${contact.email ? `<p>✉️ <a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function manageEmergencyContacts() {
+            renderEmergencyContactsList();
+            document.getElementById('emergencyModal').classList.add('active');
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').classList.remove('active');
+        }
+
+        function renderEmergencyContactsList() {
+            const container = document.getElementById('emergencyContactsList');
+            
+            if (emergencyContacts.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No emergency contacts yet</p></div>';
+                return;
+            }
+
+            container.innerHTML = emergencyContacts.map(contact => `
+                <div class="entry-card" style="margin-bottom: 15px;">
+                    <div class="entry-header">
+                        <div>
+                            <div class="entry-title">${escapeHtml(contact.name)}</div>
+                            ${contact.relationship ? `<div style="color: var(--text-light); font-size: 14px;">${escapeHtml(contact.relationship)}</div>` : ''}
+                        </div>
+                        <div class="entry-actions">
+                            <button class="btn btn-primary btn-small" onclick='editEmergencyContact("${contact.id}")'>Edit</button>
+                            <button class="btn btn-danger btn-small" onclick='deleteEmergencyContact("${contact.id}")'>Delete</button>
+                        </div>
+                    </div>
+                    <div style="font-size: 14px; color: var(--text);">
+                        <p>📞 ${escapeHtml(contact.phone)}</p>
+                        ${contact.email ? `<p>✉️ ${escapeHtml(contact.email)}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addEmergencyContact() {
+            editingEmergencyContact = null;
+            document.getElementById('emergencyContactModalTitle').textContent = 'Add Emergency Contact';
+            document.getElementById('emergencyContactForm').reset();
+            document.getElementById('emergencyContactId').value = '';
+            document.getElementById('emergencyContactModal').classList.add('active');
+        }
+
+        function editEmergencyContact(id) {
+            editingEmergencyContact = id;
+            const contact = emergencyContacts.find(c => c.id === id);
+            
+            document.getElementById('emergencyContactModalTitle').textContent = 'Edit Emergency Contact';
+            document.getElementById('emergencyContactId').value = id;
+            document.getElementById('emergencyContactName').value = contact.name;
+            document.getElementById('emergencyContactRelationship').value = contact.relationship || '';
+            document.getElementById('emergencyContactPhone').value = contact.phone;
+            document.getElementById('emergencyContactEmail').value = contact.email || '';
+            
+            document.getElementById('emergencyContactModal').classList.add('active');
+        }
+
+        function deleteEmergencyContact(id) {
+            if (!confirm('Delete this emergency contact?')) return;
+            emergencyContacts = emergencyContacts.filter(c => c.id !== id);
+            saveEmergencyContacts();
+            renderEmergencyContactsList();
+        }
+
+        function saveEmergencyContact(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('emergencyContactId').value || generateId();
+            const contact = {
+                id,
+                name: document.getElementById('emergencyContactName').value,
+                relationship: document.getElementById('emergencyContactRelationship').value,
+                phone: document.getElementById('emergencyContactPhone').value,
+                email: document.getElementById('emergencyContactEmail').value
+            };
+
+            if (editingEmergencyContact) {
+                const index = emergencyContacts.findIndex(c => c.id === id);
+                emergencyContacts[index] = contact;
+            } else {
+                emergencyContacts.push(contact);
+            }
+
+            saveEmergencyContacts();
+            closeEmergencyContactForm();
+            renderEmergencyContactsList();
+        }
+
+        function closeEmergencyContactForm() {
+            document.getElementById('emergencyContactModal').classList.remove('active');
+            editingEmergencyContact = null;
+        }
+
+        // File Upload Handling
+        function setupFileUpload() {
+            const dropArea = document.getElementById('fileDropArea');
+            const fileInput = document.getElementById('fileInput');
+
+            dropArea.addEventListener('click', () => fileInput.click());
+
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('dragover');
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`${file.name} is too large. Maximum size is 5MB.`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const attachment = {
+                        id: generateId(),
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        data: e.target.result
+                    };
+                    currentAttachments.push(attachment);
+                    renderUploadedFiles();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderUploadedFiles() {
+            const container = document.getElementById('uploadedFilesList');
+            container.innerHTML = currentAttachments.map(att => `
+                <div class="attachment-item">
+                    <div class="attachment-info">
+                        <div class="attachment-icon">${getFileExtension(att.name)}</div>
+                        <div class="attachment-details">
+                            <div class="attachment-name">${escapeHtml(att.name)}</div>
+                            <div class="attachment-size">${formatFileSize(att.size)}</div>
+                        </div>
+                    </div>
+                    <div class="attachment-actions">
+                        <button type="button" class="btn btn-danger btn-small" onclick='removeAttachment("${att.id}")'>Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeAttachment(id) {
+            currentAttachments = currentAttachments.filter(a => a.id !== id);
+            renderUploadedFiles();
+        }
+
+        function getFileExtension(filename) {
+            const ext = filename.split('.').pop().toUpperCase();
+            return ext.substring(0, 3);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function downloadAttachment(attachment) {
+            const link = document.createElement('a');
+            link.href = attachment.data;
+            link.download = attachment.name;
+            link.click();
+        }
+
+        // Data Management
+        function loadData() {
+            const stored = localStorage.getItem('vaultData');
+            if (stored) {
+                vaultData = JSON.parse(stored);
+                // Ensure all categories exist (migration for new categories)
+                let needsSave = false;
+                Object.keys(CATEGORIES).forEach(key => {
+                    if (!vaultData[key]) {
+                        vaultData[key] = [];
+                        needsSave = true;
+                    }
+                });
+                // Migrate existing entries to add timestamps if missing
+                migrateTimestamps();
+                // Save if we added new categories
+                if (needsSave) {
+                    saveData();
+                }
+            } else {
+                vaultData = {};
+                Object.keys(CATEGORIES).forEach(key => {
+                    vaultData[key] = [];
+                });
+            }
+        }
+
+        function migrateTimestamps() {
+            let needsSave = false;
+            const now = new Date().toISOString();
+            
+            Object.keys(vaultData).forEach(category => {
+                vaultData[category].forEach(entry => {
+                    if (!entry.createdAt) {
+                        entry.createdAt = now;
+                        entry.updatedAt = null;
+                        needsSave = true;
+                    }
+                });
+            });
+
+            if (needsSave) {
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('vaultData', JSON.stringify(vaultData));
+            trackUpdate();
+        }
+
+        function renderContent() {
+            const container = document.getElementById('tabContents');
+            container.innerHTML = '';
+
+            const tabContent = document.createElement('div');
+            tabContent.className = 'tab-content';
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn btn-success';
+            addBtn.innerHTML = '+ Add Entry';
+            addBtn.onclick = () => openModal();
+            tabContent.appendChild(addBtn);
+
+            // Collect all entries from all categories
+            let allEntries = [];
+            Object.keys(CATEGORIES).forEach(category => {
+                const entries = vaultData[category] || [];
+                entries.forEach(entry => {
+                    allEntries.push({
+                        ...entry,
+                        category: category,
+                        categoryName: CATEGORIES[category].name
+                    });
+                });
+            });
+
+            // Apply filters
+            allEntries = allEntries.filter(entry => {
+                // Category filter
+                if (currentFilters.category !== 'all' && entry.category !== currentFilters.category) {
+                    return false;
+                }
+
+                // Date range filter
+                if (currentFilters.dateFrom || currentFilters.dateTo) {
+                    const entryDate = new Date(entry.createdAt);
+                    
+                    if (currentFilters.dateFrom) {
+                        const fromDate = new Date(currentFilters.dateFrom);
+                        fromDate.setHours(0, 0, 0, 0);
+                        if (entryDate < fromDate) return false;
+                    }
+                    
+                    if (currentFilters.dateTo) {
+                        const toDate = new Date(currentFilters.dateTo);
+                        toDate.setHours(23, 59, 59, 999);
+                        if (entryDate > toDate) return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // Sort by creation date (newest first)
+            allEntries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            if (allEntries.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.innerHTML = `
+                    <p>No entries found</p>
+                    <p style="font-size: 14px;">Click "Add Entry" to create your first entry</p>
+                `;
+                tabContent.appendChild(empty);
+            } else {
+                const entriesContainer = document.createElement('div');
+                entriesContainer.className = 'entries mt-20';
+                allEntries.forEach(entry => {
+                    entriesContainer.appendChild(renderEntry(entry));
+                });
+                tabContent.appendChild(entriesContainer);
+            }
+
+            container.appendChild(tabContent);
+        }
+
+        function renderEntry(entry) {
+            const card = document.createElement('div');
+            card.className = 'entry-card';
+
+            const header = document.createElement('div');
+            header.className = 'entry-header';
+            
+            const titleSection = document.createElement('div');
+            titleSection.innerHTML = `
+                <div class="entry-title">${escapeHtml(entry.title)}</div>
+                <div class="entry-category-badge">${escapeHtml(entry.categoryName)}</div>
+                <div class="entry-timestamp">
+                    <div class="entry-timestamp-item">
+                        <span class="timestamp-icon">📅</span>
+                        <span class="timestamp-label">Created:</span>
+                        <span class="timestamp-value">${formatTimestamp(entry.createdAt)}</span>
+                    </div>
+                    ${entry.updatedAt ? `
+                    <div class="entry-timestamp-item">
+                        <span class="timestamp-icon">🔄</span>
+                        <span class="timestamp-label">Updated:</span>
+                        <span class="timestamp-value">${formatTimestamp(entry.updatedAt)}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            const actions = document.createElement('div');
+            actions.className = 'entry-actions';
+            actions.innerHTML = `
+                <button class="btn btn-primary btn-small" onclick='editEntry("${entry.id}", "${entry.category}")'>Edit</button>
+                <button class="btn btn-danger btn-small" onclick='deleteEntry("${entry.id}", "${entry.category}")'>Delete</button>
+            `;
+            
+            header.appendChild(titleSection);
+            header.appendChild(actions);
+            card.appendChild(header);
+
+            const fields = document.createElement('div');
+            fields.className = 'entry-fields';
+
+            entry.fields.forEach(field => {
+                if (field.value) {
+                    const row = document.createElement('div');
+                    row.className = 'field-row';
+                    row.innerHTML = `
+                        <div class="field-label">${escapeHtml(field.label)}:</div>
+                        <div class="field-value ${field.type === 'sensitive' ? 'sensitive' : ''}">
+                            ${escapeHtml(field.value)}
+                        </div>
+                    `;
+                    fields.appendChild(row);
+                }
+            });
+
+            if (entry.notes) {
+                const row = document.createElement('div');
+                row.className = 'field-row';
+                row.innerHTML = `
+                    <div class="field-label">Notes:</div>
+                    <div class="field-value">${escapeHtml(entry.notes).replace(/\n/g, '<br>')}</div>
+                `;
+                fields.appendChild(row);
+            }
+
+            card.appendChild(fields);
+
+            // Render attachments
+            if (entry.attachments && entry.attachments.length > 0) {
+                const attachmentsSection = document.createElement('div');
+                attachmentsSection.className = 'attachments-section';
+                attachmentsSection.innerHTML = '<div class="attachments-label">📎 Attachments:</div>';
+                
+                const attachmentList = document.createElement('div');
+                attachmentList.className = 'attachment-list';
+                
+                entry.attachments.forEach(att => {
+                    const item = document.createElement('div');
+                    item.className = 'attachment-item';
+                    item.innerHTML = `
+                        <div class="attachment-info">
+                            <div class="attachment-icon">${getFileExtension(att.name)}</div>
+                            <div class="attachment-details">
+                                <div class="attachment-name">${escapeHtml(att.name)}</div>
+                                <div class="attachment-size">${formatFileSize(att.size)}</div>
+                            </div>
+                        </div>
+                        <div class="attachment-actions">
+                            <button class="btn btn-primary btn-small" onclick='downloadAttachment(${JSON.stringify(att)})'>Download</button>
+                        </div>
+                    `;
+                    attachmentList.appendChild(item);
+                });
+                
+                attachmentsSection.appendChild(attachmentList);
+                card.appendChild(attachmentsSection);
+            }
+
+            return card;
+        }
+
+        function openModal(entryId = null, category = null) {
+            editingEntry = entryId;
+            editingEntryCategory = category;
+            currentAttachments = [];
+            
+            const modal = document.getElementById('entryModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('entryForm');
+            const categorySelect = document.getElementById('entryCategory');
+            const titleOptionalIndicator = document.getElementById('titleOptionalIndicator');
+
+            // Populate category dropdown
+            categorySelect.innerHTML = '<option value="">Select a category...</option>';
+            Object.keys(CATEGORIES).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = CATEGORIES[key].name;
+                categorySelect.appendChild(option);
+            });
+            
+            // Initialize title field as required
+            document.getElementById('entryTitle').required = true;
+            titleOptionalIndicator.textContent = '*';
+            
+            if (entryId && category) {
+                title.textContent = 'Edit Entry';
+                const entry = vaultData[category].find(e => e.id === entryId);
+                document.getElementById('entryId').value = entryId;
+                document.getElementById('entryCategory').value = category;
+                document.getElementById('entryTitle').value = entry.title;
+                document.getElementById('entryNotes').value = entry.notes || '';
+                currentAttachments = entry.attachments ? [...entry.attachments] : [];
+                updateFormFields();
+                renderFormFields(entry.fields);
+                renderUploadedFiles();
+            } else {
+                title.textContent = 'Add Entry';
+                form.reset();
+                document.getElementById('entryId').value = '';
+                document.getElementById('fieldsContainer').innerHTML = '';
+                renderUploadedFiles();
+            }
+
+            modal.classList.add('active');
+        }
+
+        function updateFormFields() {
+            const category = document.getElementById('entryCategory').value;
+            const attachmentsGroup = document.getElementById('attachmentsFormGroup');
+            const titleInput = document.getElementById('entryTitle');
+            const titleOptionalIndicator = document.getElementById('titleOptionalIndicator');
+            
+            if (!category) {
+                document.getElementById('fieldsContainer').innerHTML = '';
+                attachmentsGroup.style.display = 'none';
+                titleInput.required = true;
+                titleOptionalIndicator.textContent = '*';
+                return;
+            }
+
+            // Make title optional for pets category
+            if (category === 'pets') {
+                titleInput.required = false;
+                titleInput.placeholder = 'Optional - leave blank to use pet name';
+                titleOptionalIndicator.textContent = '(optional - will use pet name if blank)';
+            } else {
+                titleInput.required = true;
+                titleInput.placeholder = '';
+                titleOptionalIndicator.textContent = '*';
+            }
+
+            // Show/hide attachments based on category
+            if (CATEGORIES[category].allowAttachments) {
+                attachmentsGroup.style.display = 'block';
+            } else {
+                attachmentsGroup.style.display = 'none';
+            }
+
+            renderFormFields();
+        }
+
+        function closeModal() {
+            document.getElementById('entryModal').classList.remove('active');
+            editingEntry = null;
+            editingEntryCategory = null;
+            currentAttachments = [];
+        }
+
+        function renderFormFields(existingFields = null) {
+            const container = document.getElementById('fieldsContainer');
+            const category = document.getElementById('entryCategory').value;
+            
+            if (!category) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            const categoryFields = CATEGORIES[category].fields;
+            
+            categoryFields.forEach((fieldDef, index) => {
+                const existingValue = existingFields ? 
+                    (existingFields.find(f => f.label === fieldDef.label)?.value || '') : '';
+
+                const group = document.createElement('div');
+                group.className = 'form-group';
+                group.innerHTML = `
+                    <label>${fieldDef.label}</label>
+                    <input 
+                        type="${fieldDef.type === 'sensitive' ? 'text' : fieldDef.type}" 
+                        id="field_${index}"
+                        data-label="${fieldDef.label}"
+                        data-type="${fieldDef.type}"
+                        value="${escapeHtml(existingValue)}"
+                    >
+                `;
+                container.appendChild(group);
+            });
+        }
+
+        function saveEntry(event) {
+            event.preventDefault();
+
+            const category = document.getElementById('entryCategory').value;
+            
+            if (!category) {
+                alert('Please select a category');
+                return;
+            }
+
+            const entryId = document.getElementById('entryId').value || generateId();
+            let title = document.getElementById('entryTitle').value;
+            const notes = document.getElementById('entryNotes').value;
+
+            // Ensure category array exists (safety check)
+            if (!vaultData[category]) {
+                vaultData[category] = [];
+            }
+
+            const fields = [];
+            const categoryFields = CATEGORIES[category].fields;
+            categoryFields.forEach((fieldDef, index) => {
+                const input = document.getElementById(`field_${index}`);
+                if (input) {
+                    fields.push({
+                        label: input.dataset.label,
+                        type: input.dataset.type,
+                        value: input.value
+                    });
+                }
+            });
+
+            // Auto-generate title for pets if not provided
+            if (category === 'pets' && !title) {
+                const nameField = fields.find(f => f.label === 'Name');
+                if (nameField && nameField.value) {
+                    title = nameField.value;
+                } else {
+                    title = 'Unnamed Pet';
+                }
+            }
+
+            const now = new Date().toISOString();
+            let entry;
+
+            if (editingEntry && editingEntryCategory) {
+                // If category changed, need to move entry
+                if (editingEntryCategory !== category) {
+                    // Remove from old category
+                    vaultData[editingEntryCategory] = vaultData[editingEntryCategory].filter(e => e.id !== entryId);
+                    
+                    // Add to new category as new entry
+                    const existingEntry = vaultData[editingEntryCategory]?.find(e => e.id === entryId);
+                    entry = { 
+                        id: entryId, 
+                        title, 
+                        fields, 
+                        notes,
+                        attachments: currentAttachments,
+                        createdAt: existingEntry?.createdAt || now,
+                        updatedAt: now
+                    };
+                    vaultData[category].push(entry);
+                } else {
+                    // Same category, just update
+                    const existingEntry = vaultData[category].find(e => e.id === entryId);
+                    entry = { 
+                        id: entryId, 
+                        title, 
+                        fields, 
+                        notes,
+                        attachments: currentAttachments,
+                        createdAt: existingEntry.createdAt || now,
+                        updatedAt: now
+                    };
+                    const index = vaultData[category].findIndex(e => e.id === entryId);
+                    vaultData[category][index] = entry;
+                }
+            } else {
+                // New entry
+                entry = { 
+                    id: entryId, 
+                    title, 
+                    fields, 
+                    notes,
+                    attachments: currentAttachments,
+                    createdAt: now,
+                    updatedAt: null
+                };
+                vaultData[category].push(entry);
+            }
+
+            saveData();
+            closeModal();
+            renderContent();
+        }
+
+        function editEntry(id, category) {
+            openModal(id, category);
+        }
+
+        function deleteEntry(id, category) {
+            if (!confirm('Are you sure you want to delete this entry?')) return;
+
+            vaultData[category] = vaultData[category].filter(e => e.id !== id);
+            saveData();
+            renderContent();
+        }
+
+        function exportData() {
+            const exportObj = {
+                vaultData,
+                emergencyContacts
+            };
+            const dataStr = JSON.stringify(exportObj, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `legacy-vault-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (confirm('This will replace all current data. Continue?')) {
+                        vaultData = imported.vaultData || imported;
+                        emergencyContacts = imported.emergencyContacts || [];
+                        saveData();
+                        saveEmergencyContacts();
+                        renderContent();
+                        displayEmergencyContacts();
+                        alert('Data imported successfully');
+                    }
+                } catch (error) {
+                    alert('Error importing file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function formatTimestamp(isoString) {
+            if (!isoString) return 'No date recorded';
+            
+            try {
+                const date = new Date(isoString);
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    return 'Invalid date';
+                }
+                
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+
+                // Relative time for recent entries
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins} min ago`;
+                if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+
+                // Absolute date for older entries
+                const options = { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return date.toLocaleDateString('en-US', options);
+            } catch (error) {
+                return 'Invalid date';
+            }
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize app
+        init();
+    </script>
+</body>
+</html>
